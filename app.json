@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "foodapp", 
     "name": "foodapp",
     "slug": "foodapp",
     "version": "1.0.0",
