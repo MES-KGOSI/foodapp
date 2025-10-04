@@ -4,7 +4,7 @@ const Home = () => {
         <View>
       <Text>{}</Text> ///Spacing
       <Text>{}</Text> ///Spacing
-        <Text>The Number One</Text>
+        <Text>The Number One</Text> // Text component
         <Text>The Reading List</Text>
         </View>
     )
