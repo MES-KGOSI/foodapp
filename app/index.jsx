@@ -30,10 +30,14 @@ function HeaderSection({ search, setSearch }) {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.logoRow}>
-        <Image source={require("../assets/logo.png")} style={styles.logo} />
+        <Image source={require("../assets/logo.png")} style={styles.logo} /> // added app logo
 
-        <Text style={styles.brand}>Chef Christoffel</Text>
-      </View>
+        <View>
+  <Text style={styles.brand}>Fork</Text>
+  <Text style={styles.brand}>and</Text>
+  <Text style={styles.brand}>Knife</Text>
+</View> </View>
+
 
       <View style={styles.searchBox}>
         <Ionicons name="search" size={20} color="#888" />
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 16 },
   headerContainer: { marginBottom: 16 },
   logoRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
-  logo: { width: 40, height: 40, borderRadius: 8, marginRight: 10 },
+  logo: { width: 100, height: 100, borderRadius: 8, marginRight: 10 },
   brand: { fontSize: 18, fontWeight: "700", color: "#161736" },
   searchBox: {
     flexDirection: "row",
