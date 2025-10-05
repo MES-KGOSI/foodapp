@@ -1,161 +1,283 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button, FlatList, StyleSheet, SafeAreaView } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useState, useMemo } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const Tab = createBottomTabNavigator();
-const COURSE_OPTIONS = ["Starters", "Mains", "Desserts"];
+const COURSES = ["Starters", "Mains", "Desserts"];
 
-function getAvgPrice(menu, course) {
-  const items = menu.filter((item) => item.course === course);
-  if (items.length === 0) return 0;
-  return (items.reduce((sum, item) => sum + parseFloat(item.price), 0) / items.length).toFixed(2);
-}
+const getAverages = (items) => {
+  const totals = { Starters: [], Mains: [], Desserts: [] };
+  items.forEach((i) => totals[i.course].push(parseFloat(i.price)));
+  const avg = (arr) => (arr.length ? arr.reduce((a, b) => a + b) / arr.length : 0);
+  return {
+    count: items.length,
+    Starters: avg(totals.Starters).toFixed(2),
+    Mains: avg(totals.Mains).toFixed(2),
+    Desserts: avg(totals.Desserts).toFixed(2),
+  };
+};
 
-function HomeScreen({ menu }) {
+function HomeScreen({ items, onNavigate, onRemove }) {
+  const stats = useMemo(() => getAverages(items), [items]);
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>Fork and Knife</Text>
+      <ScrollView>
+        <Text style={styles.title}>Chef Christoffel’s Menu</Text>
 
-      <TextInput style={styles.searchBar} placeholder="Search Meal" placeholderTextColor="#666" />
+        <View style={styles.toolbar}>
+          <TouchableOpacity style={styles.button} onPress={() => onNavigate("Add")}>
+            <Ionicons name="add-circle" size={20} color="#fff" />
+            <Text style={styles.btnText}>Add Item</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => onNavigate("Filter")}>
+            <Ionicons name="filter" size={20} color="#fff" />
+            <Text style={styles.btnText}>Filter</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.statsCard}>
-        <Text style={styles.statTitle}>Total Items: {menu.length}</Text>
-        <Text>Avg Starter Price: R {getAvgPrice(menu, "Starters")}</Text>
-        <Text>Avg Main Price: R {getAvgPrice(menu, "Mains")}</Text>
-        <Text>Avg Dessert Price: R {getAvgPrice(menu, "Desserts")}</Text>
+        <View style={styles.stats}>
+          <Text>Total Items: {stats.count}</Text>
+          <Text>Avg Starter Price: R {stats.Starters}</Text>
+          <Text>Avg Main Price: R {stats.Mains}</Text>
+          <Text>Avg Dessert Price: R {stats.Desserts}</Text>
+        </View>
+
+        <Text style={styles.heading}>Full Menu</Text>
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.dish}>{item.name}</Text>
+                <Text style={styles.desc}>{item.description}</Text>
+              </View>
+              <View style={{ alignItems: "flex-end" }}>
+                <Text style={styles.course}>{item.course}</Text>
+                <Text style={styles.price}>R {item.price}</Text>
+                <TouchableOpacity onPress={() => onRemove(item.id)}>
+                  <Ionicons name="trash" size={18} color="#c00" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function AddItemScreen({ onSave, onBack }) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [course, setCourse] = useState("Starters");
+  const [price, setPrice] = useState("");
+
+  const handleSave = () => {
+    if (!name || !description || !price) return;
+    onSave({ id: Date.now().toString(), name, description, course, price });
+    setName("");
+    setDescription("");
+    setPrice("");
+    onBack();
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Add Menu Item</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Dish Name"
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={[styles.input, { height: 80 }]}
+        placeholder="Description"
+        multiline
+        value={description}
+        onChangeText={setDescription}
+      />
+
+      <View style={styles.pickerRow}>
+        {COURSES.map((c) => (
+          <TouchableOpacity
+            key={c}
+            onPress={() => setCourse(c)}
+            style={[
+              styles.courseOption,
+              course === c && styles.courseOptionActive,
+            ]}
+          >
+            <Text style={{ color: course === c ? "#fff" : "#161736" }}>{c}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <Text style={styles.sectionTitle}>Full Menu</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Price (R)"
+        keyboardType="numeric"
+        value={price}
+        onChangeText={setPrice}
+      />
+
+      <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+        <Text style={styles.saveText}>Save Item</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.backBtn} onPress={onBack}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
+
+function FilterScreen({ items, onBack }) {
+  const [selected, setSelected] = useState("All");
+  const filtered =
+    selected === "All" ? items : items.filter((i) => i.course === selected);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Filter by Course</Text>
+
+      <View style={styles.pickerRow}>
+        {["All", ...COURSES].map((c) => (
+          <TouchableOpacity
+            key={c}
+            onPress={() => setSelected(c)}
+            style={[
+              styles.courseOption,
+              selected === c && styles.courseOptionActive,
+            ]}
+          >
+            <Text style={{ color: selected === c ? "#fff" : "#161736" }}>{c}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <FlatList
-        data={menu}
-        keyExtractor={(item, index) => index.toString()}
+        data={filtered}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.menuCard}>
+          <View style={styles.card}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.dishName}>{item.name}</Text>
-              <Text style={styles.price}>R {item.price}</Text>
-              <Text style={styles.course}>{item.course}</Text>
+              <Text style={styles.dish}>{item.name}</Text>
               <Text style={styles.desc}>{item.description}</Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text style={styles.course}>{item.course}</Text>
+              <Text style={styles.price}>R {item.price}</Text>
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No items yet.</Text>}
       />
-    </SafeAreaView>
-  );
-}
 
-function AddItemScreen({ addMenuItem }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [course, setCourse] = useState(COURSE_OPTIONS[0]);
-  const [price, setPrice] = useState("");
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>Fork and Knife</Text>
-      <View style={styles.formCard}>
-        <TextInput style={styles.input} placeholder="Dish Name e.g. Hamburger with Fries" value={name} onChangeText={setName} />
-        <TextInput style={[styles.input, { height: 70 }]} placeholder="Short description of the dish" value={description} onChangeText={setDescription} multiline />
-        <Text style={styles.label}>Course</Text>
-        <Picker selectedValue={course} style={styles.picker} onValueChange={setCourse}>
-          {COURSE_OPTIONS.map((opt) => (
-            <Picker.Item key={opt} label={opt} value={opt} />
-          ))}
-        </Picker>
-        <TextInput style={styles.input} placeholder="Price (R)" value={price} onChangeText={setPrice} keyboardType="numeric" />
-        <Button
-          title="Save Item"
-          onPress={() => {
-            if (name && description && price) {
-              addMenuItem({ name, description, course, price });
-              setName(""); setDescription(""); setPrice("");
-            }
-          }}
-        />
-      </View>
-    </SafeAreaView>
-  );
-}
-
-function FilterScreen({ menu }) {
-  const [selectedCourse, setSelectedCourse] = useState("All");
-  const filtered = selectedCourse === "All" ? menu : menu.filter((i) => i.course === selectedCourse);
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>Fork and Knife</Text>
-      <TextInput style={styles.searchBar} placeholder="Search Meal" placeholderTextColor="#666" />
-      <Text style={styles.label}>Course</Text>
-      <Picker selectedValue={selectedCourse} style={styles.picker} onValueChange={setSelectedCourse}>
-        <Picker.Item label="All (Starter, Main, Dessert)" value="All" />
-        {COURSE_OPTIONS.map((opt) => (
-          <Picker.Item key={opt} label={opt} value={opt} />
-        ))}
-      </Picker>
-      <FlatList
-        data={filtered}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.menuCard}>
-            <Text style={styles.dishName}>{item.name}</Text>
-            <Text style={styles.price}>R {item.price}</Text>
-            <Text style={styles.course}>{item.course}</Text>
-            <Text style={styles.desc}>{item.description}</Text>
-          </View>
-        )}
-        ListEmptyComponent={<Text style={styles.empty}>No dishes found.</Text>}
-      />
+      <TouchableOpacity style={styles.backBtn} onPress={onBack}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 export default function App() {
-  const [menu, setMenu] = useState([]);
-  const addMenuItem = (item) => setMenu([...menu, item]);
+  const [screen, setScreen] = useState("Home");
+  const [items, setItems] = useState([
+    { id: "1", name: "Heirloom Tomato Carpaccio", description: "Basil oil, micro greens, sea salt.", course: "Starters", price: "85" },
+    { id: "2", name: "Sous-vide Lamb Rump", description: "Smoked aubergine, rosemary jus.", course: "Mains", price: "210" },
+    { id: "3", name: "Dark Chocolate Fondant", description: "Vanilla bean ice cream.", course: "Desserts", price: "95" },
+  ]);
+
+  const addItem = (item) => setItems((prev) => [item, ...prev]);
+  const removeItem = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
+
+  if (screen === "Add")
+    return <AddItemScreen onSave={addItem} onBack={() => setScreen("Home")} />;
+  if (screen === "Filter")
+    return <FilterScreen items={items} onBack={() => setScreen("Home")} />;
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          const icons = { Home: "home", "Add Items": "add-circle", Filter: "filter" };
-          return <Ionicons name={icons[route.name]} size={size} color={color} />;
-        },
-        tabBarStyle: { backgroundColor: "#161736", paddingVertical: 8 },
-        tabBarActiveTintColor: "#fff",
-        tabBarInactiveTintColor: "#aaa",
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="Home">{() => <HomeScreen menu={menu} />}</Tab.Screen>
-      <Tab.Screen name="Add Items">{() => <AddItemScreen addMenuItem={addMenuItem} />}</Tab.Screen>
-      <Tab.Screen name="Filter">{() => <FilterScreen menu={menu} />}</Tab.Screen>
-    </Tab.Navigator>
-  ); // ✅ this return is inside the function
+    <HomeScreen items={items} onNavigate={setScreen} onRemove={removeItem} />
+  );
 }
 
-
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 18 },
-  logo: { fontWeight: "bold", fontSize: 22, alignSelf: "center", color: "#161736", marginBottom: 10 },
-  searchBar: { backgroundColor: "#F5F5FC", borderRadius: 10, padding: 10, marginBottom: 15, borderWidth: 1, borderColor: "#DDD" },
-  statsCard: { backgroundColor: "#E9E9F7", padding: 12, borderRadius: 8, marginBottom: 20 },
-  statTitle: { fontWeight: "600", marginBottom: 5 },
-  sectionTitle: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
-  menuCard: { backgroundColor: "#F5F5FC", borderRadius: 10, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: "#E4E4E4" },
-  dishName: { fontWeight: "700", fontSize: 16 },
-  price: { color: "#161736", fontWeight: "600" },
-  course: { backgroundColor: "#161736", color: "#fff", alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, marginTop: 4, marginBottom: 6 },
-  desc: { color: "#555" },
-  formCard: { backgroundColor: "#fff", borderRadius: 10, padding: 15, borderWidth: 1, borderColor: "#E4E4E4" },
-  input: { borderWidth: 1, borderColor: "#C3C3E5", backgroundColor: "#F5F5FC", borderRadius: 8, padding: 12, marginBottom: 12 },
-  picker: { borderWidth: 1, borderColor: "#C3C3E5", borderRadius: 8, marginBottom: 10 },
-  label: { fontWeight: "600", marginBottom: 5 },
-  empty: { textAlign: "center", color: "#888", marginTop: 50 },
-});
-
+  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
+  title: { fontSize: 20, fontWeight: "bold", color: "#161736", marginBottom: 12 },
+  heading: { fontSize: 16, fontWeight: "bold", marginVertical: 10 },
+  toolbar: { flexDirection: "row", gap: 10, marginBottom: 10 },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#161736",
+    borderRadius: 12,
+    padding: 8,
+    gap: 6,
+  },
+  btnText: { color: "#fff", fontSize: 14 },
+  stats: {
+    backgroundColor: "#E9E9F7",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 14,
+  },
+  card: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#F5F5FC",
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E4E4E4",
+    marginBottom: 8,
+  },
+  dish: { fontWeight: "600" },
+  desc: { color: "#555", fontSize: 13 },
+  course: {
+    backgroundColor: "#161736",
+    color: "#fff",
+    paddingHorizontal: 6,
+    borderRadius: 8,
+    textAlign: "center",
+    marginBottom: 3,
+    fontSize: 12,
+  },
+  price: { fontWeight: "bold", marginBottom: 4 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#C3C3E5",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+    backgroundColor: "#F5F5FC",
+  },
+  pickerRow: { flexDirection: "row", justifyContent: "space-around", marginBottom: 12 },
+  courseOption: {
+    borderWidth: 1,
+    borderColor: "#161736",
+    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  courseOptionActive: { backgroundColor: "#161736" },
+  saveBtn: {
+    backgroundColor: "#161736",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 6,
+  },
+  saveText: { color: "#fff", fontWeight: "600" },
+  backBtn: { marginTop: 20, alignItems: "center" },
+  backText: { color: "#161736", fontWeight: "500" },
+})
