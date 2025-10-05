@@ -54,37 +54,37 @@ function HeaderSection({ search, setSearch }) {
 
 function BottomNav({ current, setScreen }) {
   const tabs = [
-    { label: "Home", icon: "home-outline", screen: "Home" },
-    { label: "Add", icon: "add-circle-outline", screen: "Add" },
-    { label: "Filter", icon: "filter-outline", screen: "Filter" },
+    { label: "Home", icon: require("../assets/home.png"), screen: "Home" },
+    { label: "Add", icon: require("../assets/add.png"), screen: "Add" },
+    { label: "Filter", icon: require("../assets/filter.png"), screen: "Filter" },
   ];
 
   return (
     <View style={styles.bottomNav}>
-      {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab.label}
-          style={styles.navItem}
-          onPress={() => setScreen(tab.screen)}
-        >
-          <Ionicons
-            name={tab.icon}
-            size={22}
-            color={current === tab.screen ? "#fff" : "#D3D3E0"}
-          />
-          <Text
-            style={[
-              styles.navText,
-              { color: current === tab.screen ? "#fff" : "#D3D3E0" },
-            ]}
+      {tabs.map((tab) => {
+        const isActive = current === tab.screen;
+        return (
+          <TouchableOpacity
+            key={tab.label}
+            style={[styles.navItem, isActive && styles.navItemActive]}
+            onPress={() => setScreen(tab.screen)}
           >
-            {tab.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Image
+          source={tab.icon}
+         style={[styles.icon, { width: 24, height: 24 }]}
+          />
+
+
+            <Text style={[styles.navText, { color: isActive ? "#fff" : "#D3D3E0" }]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
+
 
 function HomeScreen({ items, onNavigate, onRemove }) {
   const stats = useMemo(() => getAverages(items), [items]);
@@ -374,4 +374,41 @@ const styles = StyleSheet.create({
   },
   navItem: { alignItems: "center" },
   navText: { fontSize: 12, marginTop: 4 },
+
+
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#080029",
+    borderRadius: 30,
+    paddingVertical: 10,
+    elevation: 5, // shadow for Android
+    shadowColor: "#000", // shadow for iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  navItem: {
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  navItemActive: {
+    backgroundColor: "#3a3a5a",
+    borderRadius: 20,
+  },
+  icon: {
+    width: 34,
+    height: 34,
+    marginBottom: 4,
+    resizeMode: "contain",
+  },
+  navText: {
+    fontSize: 12,
+  },
 });
