@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -25,23 +26,75 @@ const getAverages = (items) => {
   };
 };
 
+function HeaderSection({ search, setSearch }) {
+  return (
+    <View style={styles.headerContainer}>
+      <View style={styles.logoRow}>
+        <Image source={require("../assets/logo.png")} style={styles.logo} />
+
+        <Text style={styles.brand}>Chef Christoffel</Text>
+      </View>
+
+      <View style={styles.searchBox}>
+        <Ionicons name="search" size={20} color="#888" />
+        <TextInput
+          placeholder="Search dishes..."
+          value={search}
+          onChangeText={setSearch}
+          style={styles.searchInput}
+        />
+      </View>
+    </View>
+  );
+}
+
+function BottomNav({ current, setScreen }) {
+  const tabs = [
+    { label: "Home", icon: "home-outline", screen: "Home" },
+    { label: "Add", icon: "add-circle-outline", screen: "Add" },
+    { label: "Filter", icon: "filter-outline", screen: "Filter" },
+  ];
+
+  return (
+    <View style={styles.bottomNav}>
+      {tabs.map((tab) => (
+        <TouchableOpacity
+          key={tab.label}
+          style={styles.navItem}
+          onPress={() => setScreen(tab.screen)}
+        >
+          <Ionicons
+            name={tab.icon}
+            size={22}
+            color={current === tab.screen ? "#fff" : "#D3D3E0"}
+          />
+          <Text
+            style={[
+              styles.navText,
+              { color: current === tab.screen ? "#fff" : "#D3D3E0" },
+            ]}
+          >
+            {tab.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
 function HomeScreen({ items, onNavigate, onRemove }) {
   const stats = useMemo(() => getAverages(items), [items]);
+  const [search, setSearch] = useState("");
+  const filtered = items.filter((i) =>
+    i.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={styles.title}>Chef Christoffel’s Menu</Text>
+        <HeaderSection search={search} setSearch={setSearch} />
 
-        <View style={styles.toolbar}>
-          <TouchableOpacity style={styles.button} onPress={() => onNavigate("Add")}>
-            <Ionicons name="add-circle" size={20} color="#fff" />
-            <Text style={styles.btnText}>Add Item</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => onNavigate("Filter")}>
-            <Ionicons name="filter" size={20} color="#fff" />
-            <Text style={styles.btnText}>Filter</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.title}>Food Menu</Text>
 
         <View style={styles.stats}>
           <Text>Total Items: {stats.count}</Text>
@@ -52,7 +105,7 @@ function HomeScreen({ items, onNavigate, onRemove }) {
 
         <Text style={styles.heading}>Full Menu</Text>
         <FlatList
-          data={items}
+          data={filtered}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.card}>
@@ -92,6 +145,7 @@ function AddItemScreen({ onSave, onBack }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <HeaderSection search="" setSearch={() => {}} />
       <Text style={styles.title}>Add Menu Item</Text>
 
       <TextInput
@@ -149,6 +203,7 @@ function FilterScreen({ items, onBack }) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <HeaderSection search="" setSearch={() => {}} />
       <Text style={styles.title}>Filter by Course</Text>
 
       <View style={styles.pickerRow}>
@@ -193,38 +248,65 @@ function FilterScreen({ items, onBack }) {
 export default function App() {
   const [screen, setScreen] = useState("Home");
   const [items, setItems] = useState([
-    { id: "1", name: "Heirloom Tomato Carpaccio", description: "Basil oil, micro greens, sea salt.", course: "Starters", price: "85" },
-    { id: "2", name: "Sous-vide Lamb Rump", description: "Smoked aubergine, rosemary jus.", course: "Mains", price: "210" },
-    { id: "3", name: "Dark Chocolate Fondant", description: "Vanilla bean ice cream.", course: "Desserts", price: "95" },
+    {
+      id: "1",
+      name: "Heirloom Tomato Carpaccio",
+      description: "Basil oil, micro greens, sea salt.",
+      course: "Starters",
+      price: "85",
+    },
+    {
+      id: "2",
+      name: "Sous-vide Lamb Rump",
+      description: "Smoked aubergine, rosemary jus.",
+      course: "Mains",
+      price: "210",
+    },
+    {
+      id: "3",
+      name: "Dark Chocolate Fondant",
+      description: "Vanilla bean ice cream.",
+      course: "Desserts",
+      price: "95",
+    },
   ]);
 
   const addItem = (item) => setItems((prev) => [item, ...prev]);
   const removeItem = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
 
+  let ActiveScreen;
   if (screen === "Add")
-    return <AddItemScreen onSave={addItem} onBack={() => setScreen("Home")} />;
-  if (screen === "Filter")
-    return <FilterScreen items={items} onBack={() => setScreen("Home")} />;
+    ActiveScreen = <AddItemScreen onSave={addItem} onBack={() => setScreen("Home")} />;
+  else if (screen === "Filter")
+    ActiveScreen = <FilterScreen items={items} onBack={() => setScreen("Home")} />;
+  else ActiveScreen = <HomeScreen items={items} onNavigate={setScreen} onRemove={removeItem} />;
 
   return (
-    <HomeScreen items={items} onNavigate={setScreen} onRemove={removeItem} />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {ActiveScreen}
+      <BottomNav current={screen} setScreen={setScreen} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  title: { fontSize: 20, fontWeight: "bold", color: "#161736", marginBottom: 12 },
-  heading: { fontSize: 16, fontWeight: "bold", marginVertical: 10 },
-  toolbar: { flexDirection: "row", gap: 10, marginBottom: 10 },
-  button: {
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  headerContainer: { marginBottom: 16 },
+  logoRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  logo: { width: 40, height: 40, borderRadius: 8, marginRight: 10 },
+  brand: { fontSize: 18, fontWeight: "700", color: "#161736" },
+  searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#161736",
-    borderRadius: 12,
-    padding: 8,
-    gap: 6,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    backgroundColor: "#f5f5f5",
   },
-  btnText: { color: "#fff", fontSize: 14 },
+  searchInput: { flex: 1, padding: 8 },
+  title: { fontSize: 20, fontWeight: "bold", color: "#161736", marginVertical: 10 },
+  heading: { fontSize: 16, fontWeight: "bold", marginVertical: 10 },
   stats: {
     backgroundColor: "#E9E9F7",
     borderRadius: 8,
@@ -280,4 +362,12 @@ const styles = StyleSheet.create({
   saveText: { color: "#fff", fontWeight: "600" },
   backBtn: { marginTop: 20, alignItems: "center" },
   backText: { color: "#161736", fontWeight: "500" },
-})
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#161736",
+    paddingVertical: 10,
+  },
+  navItem: { alignItems: "center" },
+  navText: { fontSize: 12, marginTop: 4 },
+});
