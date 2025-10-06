@@ -121,7 +121,7 @@ function HomeScreen({ items, onNavigate, onRemove }) {
                 <Text style={styles.course}>{item.course}</Text>
                 <Text style={styles.price}>R {item.price}</Text>
                 <TouchableOpacity onPress={() => onRemove(item.id)}>
-                  <Ionicons name="trash" size={18} color="#c00" />
+                  <Ionicons name="trash" size={18} color="#ffffff" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -176,7 +176,7 @@ function AddItemScreen({ onSave, onBack }) {
               course === c && styles.courseOptionActive,
             ]}
           >
-            <Text style={{ color: course === c ? "#fff" : "#161736" }}>{c}</Text>
+            <Text style={{ color: course === c ? "#fff" : "#080029" }}>{c}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -220,7 +220,7 @@ function FilterScreen({ items, onBack }) {
               selected === c && styles.courseOptionActive,
             ]}
           >
-            <Text style={{ color: selected === c ? "#fff" : "#161736" }}>{c}</Text>
+            <Text style={{ color: selected === c ? "#fff" : "#080029" }}>{c}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   headerContainer: { marginBottom: 16 },
   logoRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   logo: { width: 100, height: 100, borderRadius: 8, marginRight: 10 },
-  brand: { fontSize: 18, fontWeight: "700", color: "#161736" },
+  brand: { fontSize: 18, fontWeight: "700", color: "#080029" },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   searchInput: { flex: 1, padding: 8 },
-  title: { fontSize: 20, fontWeight: "bold", color: "#161736", marginVertical: 10 },
+  title: { fontSize: 20, fontWeight: "bold", color: "#080029", marginVertical: 10 },
   heading: { fontSize: 16, fontWeight: "bold", marginVertical: 10 },
   stats: {
     backgroundColor: "#E9E9F7",
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   dish: { fontWeight: "600" },
   desc: { color: "#555", fontSize: 13 },
   course: {
-    backgroundColor: "#161736",
+    backgroundColor: "#080029",
     color: "#fff",
     paddingHorizontal: 6,
     borderRadius: 8,
@@ -350,14 +350,14 @@ const styles = StyleSheet.create({
   pickerRow: { flexDirection: "row", justifyContent: "space-around", marginBottom: 12 },
   courseOption: {
     borderWidth: 1,
-    borderColor: "#161736",
+    borderColor: "#080029",
     borderRadius: 10,
     paddingVertical: 6,
     paddingHorizontal: 12,
   },
-  courseOptionActive: { backgroundColor: "#161736" },
+  courseOptionActive: { backgroundColor: "#080029" },
   saveBtn: {
-    backgroundColor: "#161736",
+    backgroundColor: "#080029",
     padding: 12,
     borderRadius: 10,
     alignItems: "center",
@@ -365,11 +365,11 @@ const styles = StyleSheet.create({
   },
   saveText: { color: "#fff", fontWeight: "600" },
   backBtn: { marginTop: 20, alignItems: "center" },
-  backText: { color: "#161736", fontWeight: "500" },
+  backText: { color: "#080029", fontWeight: "500" },
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#161736",
+    backgroundColor: "#080029",
     paddingVertical: 10,
   },
   navItem: { alignItems: "center" },
