@@ -121,7 +121,7 @@ function HomeScreen({ items, onNavigate, onRemove }) {
                 <Text style={styles.course}>{item.course}</Text>
                 <Text style={styles.price}>R {item.price}</Text>
                 <TouchableOpacity onPress={() => onRemove(item.id)}>
-                  <Ionicons name="trash" size={18} color="#ffffff" />
+                  <Ionicons name="trash" size={18} color="#080029" />
                 </TouchableOpacity>
               </View>
             </View>
