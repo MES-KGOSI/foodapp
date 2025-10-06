@@ -12,6 +12,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
+
+
 
 // Food courses examples
 const COURSES = ["Starters", "Mains", "Desserts"];
@@ -247,31 +250,67 @@ function FilterScreen({ items, onBack, activeTab, setScreen }) {
         <HeaderSection titleOverride="Filter" search="" setSearch={() => {}} />
         <TabBar activeTab={activeTab} setScreen={setScreen} />
 
-        <Text style={styles.title}>Filter by Course</Text>
-        <View style={styles.pickerRow}>
-          {["All", ...COURSES].map((c) => (
-            <TouchableOpacity key={c} onPress={() => setSelected(c)} style={[styles.courseOption, selected === c && styles.courseOptionActive]}>
-              <Text style={{ color: selected === c ? "#fff" : "#080029" }}>{c}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Courses Dropdown Section */}
+        <View style={{ marginTop: 20, marginBottom: 20 }}>
+          <Text style={{ 
+            fontSize: 18, 
+            fontWeight: "700", 
+            color: "#080029", 
+            marginBottom: 8 
+          }}>
+            Courses
+          </Text>
+          <View style={{
+            borderWidth: 1,
+            borderColor: "#ccc",
+            borderRadius: 8,
+            overflow: "hidden",
+            backgroundColor: "#fff",
+          }}>
+            <Picker
+              selectedValue={selected}
+              onValueChange={(value) => setSelected(value)}
+              dropdownIconColor="#080029"
+              style={{ color: "#080029" }}
+            >
+              <Picker.Item label="All" value="All" />
+              <Picker.Item label="Starters" value="Starters" />
+              <Picker.Item label="Mains" value="Mains" />
+              <Picker.Item label="Desserts" value="Desserts" />
+            </Picker>
+          </View>
         </View>
 
-        {filtered.map(item => (
-          <View key={item.id} style={styles.card}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.dish}>{item.name}</Text>
-              <Text style={styles.desc}>{item.description}</Text>
+        
+        {/* New All Dishes section */}
+        <View style={{ marginTop: 5 }}>
+          <Text style={[styles.title, { marginBottom: 5 }]}>All Dishes</Text>
+          <Text style={{ color: "grey", fontSize: 14, lineHeight: 20 }}>
+            All added courses are displayed here. Select the drop down to view the dishes in their
+            categories e.g. Starter, Main, Dessert.
+          </Text>
+        </View>
+
+       {/* Filtered Dishes */}
+        <View style={{ marginTop: 10 }}>
+          {filtered.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.dish}>{item.name}</Text>
+                <Text style={styles.desc}>{item.description}</Text>
+              </View>
+              <View style={{ alignItems: "flex-end" }}>
+                <Text style={styles.course}>{item.course}</Text>
+                <Text style={styles.price}>R {item.price}</Text>
+              </View>
             </View>
-            <View style={{ alignItems: "flex-end" }}>
-              <Text style={styles.course}>{item.course}</Text>
-              <Text style={styles.price}>R {item.price}</Text>
-            </View>
-          </View>
-        ))}
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
 
 // Main App
 export default function App() {
@@ -348,7 +387,7 @@ tabUnderline: {
   card: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#F5F5FC", padding: 12, borderRadius: 10, borderWidth: 1, borderColor: "#E4E4E4", marginBottom: 8 },
   dish: { fontWeight: "600" },
   desc: { color: "#555", fontSize: 13 },
-  course: { backgroundColor: "#080029", color: "#fff", paddingHorizontal: 6, borderRadius: 8, textAlign: "center", marginBottom: 3, fontSize: 12 },
+  course: { backgroundColor: "#080029", color: "#fff", paddingHorizontal: 20,paddingVertical: 8, borderRadius: 20, textAlign: "center", marginBottom: 3, fontSize: 12 },
   price: { fontWeight: "bold", marginBottom: 4 },
 
   input: { borderWidth: 1, borderColor: "#C3C3E5", borderRadius: 8, padding: 10, marginBottom: 12, backgroundColor: "#F5F5FC" },
@@ -370,4 +409,40 @@ tabUnderline: {
   navItemActive: { backgroundColor: "#3a3a5a", borderRadius: 20 },
   icon: { width: 34, height: 34, marginBottom: 4, resizeMode: "contain" },
   navText: { fontSize: 12 },
+
+  // Filter page
+  
+  section: {
+  marginTop: 25,
+  marginBottom: 15,
+},
+
+sectionTitle: {
+  fontSize: 18,
+  fontWeight: "600",
+  color: "#080029",
+  marginBottom: 8,
+},
+
+sectionDescription: {
+  fontSize: 14,
+  color: "#888",
+  lineHeight: 20,
+},
+
+dropdownContainer: {
+  borderWidth: 1,
+  borderColor: "#D3D3E0",
+  borderRadius: 10,
+  backgroundColor: "#fff",
+  paddingHorizontal: 8,
+  justifyContent: "center",
+  height: 48,
+},
+
+dropdown: {
+  color: "#080029",
+  fontSize: 16,
+},
+
 });
