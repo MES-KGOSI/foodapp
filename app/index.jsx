@@ -141,7 +141,7 @@ function HomeScreen({ items, onRemove, search, setSearch, setScreen, activeTab }
         <HeaderSection titleOverride="Home" search={search} setSearch={setSearch} />
         <TabBar activeTab={activeTab} setScreen={setScreen} />
 
-        <Text style={styles.title}>Food Menu</Text>
+
         <View style={styles.statsContainer}>
           <View style={styles.statBox}><Text>Total Items: {stats.count}</Text></View>
           <View style={styles.statBox}><Text>Avg Starter Price: R {stats.Starters}</Text></View>
@@ -149,7 +149,10 @@ function HomeScreen({ items, onRemove, search, setSearch, setScreen, activeTab }
           <View style={styles.statBox}><Text>Avg Dessert Price: R {stats.Desserts}</Text></View>
         </View>
 
-        <Text style={styles.heading}>Full Menu</Text>
+        <Text style={styles.heading}>
+  Full Menu{" "}
+  <Text style={styles.subtext}>(Added in the Add Items section and displayed here)</Text>
+</Text>
         {filtered.map(item => (
           <View key={item.id} style={styles.card}>
             <View style={{ flex: 1 }}>
@@ -384,7 +387,7 @@ tabUnderline: {
   borderRadius: 2,
 },
 
-  card: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#F5F5FC", padding: 12, borderRadius: 10, borderWidth: 1, borderColor: "#E4E4E4", marginBottom: 8 },
+  card: { flexDirection: "row", justifyContent: "space-between", backgroundColor: "#F5F5FC", padding: 8, borderRadius: 20, borderWidth: 1, borderColor: "#E4E4E4", marginBottom: 15 },
   dish: { fontWeight: "600" },
   desc: { color: "#555", fontSize: 13 },
   course: { backgroundColor: "#080029", color: "#fff", paddingHorizontal: 20,paddingVertical: 8, borderRadius: 20, textAlign: "center", marginBottom: 3, fontSize: 12 },
@@ -400,7 +403,7 @@ tabUnderline: {
   backText: { color: "#080029", fontWeight: "500" },
 
   statsContainer: { marginVertical: 8 },
-  statBox: { backgroundColor: "#fff", borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1, borderColor: "#e5e5ef", marginBottom: 6 },
+  statBox: { backgroundColor: "#fff", borderRadius: 8, paddingVertical: 15, paddingHorizontal: 12, borderWidth: 1, borderColor: "#e5e5ef", marginBottom: 6 },
   title: { fontSize: 22, fontWeight: "700", marginVertical: 10 },
   heading: { fontSize: 18, fontWeight: "600", marginVertical: 10 },
 
@@ -444,5 +447,14 @@ dropdown: {
   color: "#080029",
   fontSize: 16,
 },
+
+//Home subtext
+
+subtext: {
+  color: "#888",      // soft gray color
+  fontSize: 14,       // smaller size than heading
+  fontWeight: "400",  // lighter weight
+},
+
 
 });
