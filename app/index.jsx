@@ -173,7 +173,7 @@ function HomeScreen({ items, onRemove, search, setSearch, setScreen, activeTab }
   );
 }
 
-// Add Item Screen
+//Add Items
 function AddItemScreen({ onSave, onBack, activeTab, setScreen }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -187,52 +187,64 @@ function AddItemScreen({ onSave, onBack, activeTab, setScreen }) {
     onBack();
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 180, paddingHorizontal: 16 }}>
-        {/* FIX: Pass correct titleOverride */}
         <HeaderSection titleOverride="Add Items" search="" setSearch={() => {}} />
         <TabBar activeTab="Add Items" setScreen={setScreen} />
 
-        <Text style={styles.title}>Add Menu Item</Text>
+        {/* Dish Name */}
+        <Text style={styles.inputTitle}>Dish Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Dish Name"
+          placeholder="Enter Dish Name"
           value={name}
           onChangeText={setName}
         />
+
+        {/* Description */}
+        <Text style={styles.inputTitle}>Description</Text>
         <TextInput
           style={[styles.input, { height: 80 }]}
-          placeholder="Description"
+          placeholder="Enter Description"
           multiline
           value={description}
           onChangeText={setDescription}
         />
 
-        <View style={styles.pickerRow}>
-          {COURSES.map((c) => (
-            <TouchableOpacity
-              key={c}
-              onPress={() => setCourse(c)}
-              style={[styles.courseOption, course === c && styles.courseOptionActive]}
-            >
-              <Text style={{ color: course === c ? "#fff" : "#080029" }}>{c}</Text>
-            </TouchableOpacity>
-          ))}
+        {/* Courses */}
+        <Text style={styles.inputTitle}>Courses</Text>
+        <View style={styles.dropdownContainer}>
+          <Picker
+            selectedValue={course}
+            onValueChange={(itemValue) => setCourse(itemValue)}
+            style={styles.dropdown}
+            mode="dropdown"
+          >
+            <Picker.Item label="All" value="All" />
+            <Picker.Item label="Starters" value="Starters" />
+            <Picker.Item label="Mains" value="Mains" />
+            <Picker.Item label="Desserts" value="Desserts" />
+          </Picker>
         </View>
 
+        {/* Price */}
+        <Text style={styles.inputTitle}>Price (R)</Text>
         <TextInput
           style={styles.input}
-          placeholder="Price (R)"
+          placeholder="Enter Price"
           keyboardType="numeric"
           value={price}
           onChangeText={setPrice}
         />
 
+        {/* Save Button - full width */}
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Text style={styles.saveText}>Save Item</Text>
         </TouchableOpacity>
 
+        {/* Back Button */}
         <TouchableOpacity style={styles.backBtn} onPress={onBack}>
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
@@ -456,5 +468,30 @@ subtext: {
   fontWeight: "400",  // lighter weight
 },
 
+// Add Items page
+
+inputTitle: {
+  fontSize: 16,
+  fontWeight: "700",  // bold and visible
+  color: "#080029",
+  marginBottom: 6,
+  marginTop: 12,
+},
+
+saveBtn: {
+  backgroundColor: "#080029",
+  paddingVertical: 12,
+ paddingHorizontal: 50, // reduced horizontal width
+  borderRadius: 10,
+  alignSelf: "center", // centers the button
+  alignItems: "center",
+  marginTop: 10,
+},
+
+saveText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 16,
+},
 
 });
