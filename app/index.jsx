@@ -198,7 +198,7 @@ function AddItemScreen({ onSave, onBack, activeTab, setScreen }) {
         <Text style={styles.inputTitle}>Dish Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Dish Name"
+          placeholder="e.g. Hamburger with French Fries"
           value={name}
           onChangeText={setName}
         />
@@ -207,7 +207,7 @@ function AddItemScreen({ onSave, onBack, activeTab, setScreen }) {
         <Text style={styles.inputTitle}>Description</Text>
         <TextInput
           style={[styles.input, { height: 80 }]}
-          placeholder="Enter Description"
+          placeholder="Short description of the dish"
           multiline
           value={description}
           onChangeText={setDescription}
@@ -233,7 +233,7 @@ function AddItemScreen({ onSave, onBack, activeTab, setScreen }) {
         <Text style={styles.inputTitle}>Price (R)</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Price"
+          placeholder="e.g. R120"
           keyboardType="numeric"
           value={price}
           onChangeText={setPrice}
